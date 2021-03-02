@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Añadir persona</title>
+</head>
+<body>
+	<form method="POST"
+		action="http://127.0.0.1:8080/web/rest/personas">
+		<h2>Formulario</h2>
+		<label>Id: </label><input type="number" name="id" /><br>
+		 <br>
+		<label>Nombre: </label> <input type="text" name="nombre" /><br>
+		<br> 
+		
+			<input type="radio" name="casado" value="true">
+			<label for="casado">Casado</label> 
+			<input type="radio"  name="casado" value="false"> 
+			<label for="soltero">Soltero</label><br>
+			
+		<br> 
+		
+		<label>Sexo: </label> <input type="text"
+			name="sexo" /><br> <br> 
+		<input type="submit" value="Añadir" />
+	</form>
+
+</body>
+</html>
