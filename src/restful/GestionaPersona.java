@@ -21,6 +21,5 @@ public class GestionaPersona {
 	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public void guardar(Persona p) {
 		persona = p;
-	}	
-	
+	}		
 }

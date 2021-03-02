@@ -1,14 +1,15 @@
 package restful;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Persona {
 	int id;
-	String nombre; // los atributos tienen que ser privados
-	private boolean casado;
-	private String sexo;
+	String nombre; // los atributos no pueden ser públicos
+	boolean casado;
+	String sexo;
 	
 	public Persona() {
 		
@@ -22,6 +23,7 @@ public class Persona {
 		this.sexo = sexo;
 	}
 	
+	@XmlAttribute
 	public int getId() {
 		return id;
 	}
@@ -29,7 +31,7 @@ public class Persona {
 		this.id = id;
 	}
 	
-	@XmlElement(name="nome")
+	//@XmlElement(name="nome")
 	public String getNombre() {
 		return nombre;
 	}
