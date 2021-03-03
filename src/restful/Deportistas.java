@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -15,6 +16,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -30,49 +32,49 @@ public class Deportistas {
 	ArrayList<Deportista> deportistas = new ArrayList<>();;
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@Path("/")
 	public Response todos() {	
 		return getDeportistas("select * from deportistas", false);
 	}
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@Path("/{id}")
 	public Response jugadorId(@PathParam("id") int id) {
 		return getDeportistas("select * from deportistas where id="+id, false);		
 	}
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@Path("/deporte/{nombreDeporte}")
 	public Response porDeporte(@PathParam("nombreDeporte") String deporte) {
 		return getDeportistas("select * from deportistas where deporte like '"+deporte+"'", false);	
 	}
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@Path("/activos")
 	public Response activos() {
 		return getDeportistas("select * from deportistas where activo=true", false);
 	}
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@Path("/retirados")
 	public Response retirados() {
 		return getDeportistas("select * from deportistas where activo=false", false);
 	}
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@Path("/masculinos")
 	public Response masculinos() {
 		return getDeportistas("select * from deportistas where genero='masculino'", false); 
 	}
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@Path("/femeninos")
 	public Response femeninos() {
 		return getDeportistas("select * from deportistas where genero='femenino'", false);
@@ -101,7 +103,7 @@ public class Deportistas {
 		
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@Path("/deporte/{nombreDeporte}/activos")
 	public Response porDeporteActivos(@PathParam("nombreDeporte") String nombreDeporte) {
 		return getDeportistas("select * from deportistas where deporte='"+nombreDeporte+"'"+"and activo=true", false);
@@ -139,8 +141,12 @@ public class Deportistas {
 		}catch(ClassNotFoundException exc) {
 			System.out.println(exc.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity("Error de conexión").build();
-		}	
-		return Response.ok(deportes).build();
+		}
+		if(deportes.size() > 0) {			
+			return Response.ok(deportes).build();
+		}else {
+			return Response.status(Status.NO_CONTENT).build();
+		}		
 	}
 	
 	@POST
@@ -201,7 +207,9 @@ public class Deportistas {
 						deportistas.add(new Deportista(rs.getInt(1), rs.getString(2), 
 								rs.getBoolean(3), rs.getString(4), rs.getString(5)));				
 					}	
-					if(deportistas.size() > 0) return Response.ok(deportistas).build();
+					List<Deportista> list = deportistas;
+					GenericEntity<List<Deportista>> entity = new GenericEntity<List<Deportista>>(list) {};					
+					if(deportistas.size() > 0) return Response.ok(entity).build();
 					else return Response.status(Status.NOT_FOUND).build();
 				}else {
 					int filasAfectadas = st.executeUpdate(query); 
