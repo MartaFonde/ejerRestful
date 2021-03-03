@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -31,7 +30,7 @@ public class Deportistas {
 	ArrayList<Deportista> deportistas = new ArrayList<>();;
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON )
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/")
 	public Response todos() {	
 		return getDeportistas("select * from deportistas", false);
@@ -69,7 +68,7 @@ public class Deportistas {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/masculinos")
 	public Response masculinos() {
-		return  getDeportistas("select * from deportistas where genero='masculino'", false); 
+		return getDeportistas("select * from deportistas where genero='masculino'", false); 
 	}
 	
 	@GET
@@ -80,13 +79,31 @@ public class Deportistas {
 	}
 	
 
-	//FALTA 9
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/xg")
+	public Response porGenero() {			
+		Response res = getDeportistas("select * from deportistas where genero='femenino'", false);
+		if(deportistas != null) {
+			Object[] fem =  deportistas.toArray();
+			res = getDeportistas("select * from deportistas where genero='masculino'", false);
+			if(deportistas != null) {
+				Object[] masc =  deportistas.toArray();		
+				Object[][] depor = {fem, masc};
+				return Response.ok(depor).build();				
+			}else {
+				return res;
+			}
+		}else {
+			return res;
+		}
+	}
 		
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/deporte/{nombreDeporte}/activos")
-	public Response porDepoteActivos(@PathParam("nombreDeporte") String nombreDeporte) {
+	public Response porDeporteActivos(@PathParam("nombreDeporte") String nombreDeporte) {
 		return getDeportistas("select * from deportistas where deporte='"+nombreDeporte+"'"+"and activo=true", false);
 	}
 		
@@ -94,7 +111,12 @@ public class Deportistas {
 	@Produces(MediaType.TEXT_PLAIN)
 	@Path("/sdepor")
 	public Response numDeportistas() {
-		return getDeportistas("select * from deportistas group by nombre", false);		
+		Response res = getDeportistas("select * from deportistas group by nombre", false);
+		if(deportistas != null) {
+			return Response.status(Status.ACCEPTED).entity("Número de deportistas: "+deportistas.size()).build();
+		}else {
+			return res;
+		}		
 	}
 	
 	@GET
@@ -141,11 +163,11 @@ public class Deportistas {
 			res = getDeportistas("insert into deportistas values ("+depor[i].getId()+",'"+
 					depor[i].getNombre()+"', "+depor[i].isActivo()+", '"+depor[i].getGenero()+"','"+
 					depor[i].getDeporte()+"')", true);
-			if(res != Response.ok().build()) {
+			if(deportistas == null) {
 				return res;
 			}		
 		}	
-		return res;
+		return Response.status(Status.ACCEPTED).entity("Filas afectadas: "+depor.length).build();
 	}
 	
 	@PUT
@@ -179,23 +201,25 @@ public class Deportistas {
 						deportistas.add(new Deportista(rs.getInt(1), rs.getString(2), 
 								rs.getBoolean(3), rs.getString(4), rs.getString(5)));				
 					}	
-					Response.ok(deportistas).build();
+					if(deportistas.size() > 0) return Response.ok(deportistas).build();
+					else return Response.status(Status.NOT_FOUND).build();
 				}else {
 					int filasAfectadas = st.executeUpdate(query); 
-					if(filasAfectadas== 0) 
+					if(filasAfectadas > 0) 
 						return Response.status(Status.OK).entity("Filas afectadas: "+filasAfectadas).build();
 					else 
 						return Response.status(Status.BAD_REQUEST).entity("Error al añadir deportista").build();
 				}												
 			}catch(SQLException ex) {
 				System.out.println(ex.getMessage());
+				deportistas = null;
 				return Response.status(Status.BAD_REQUEST).entity("Error al realizar la consulta").build();
 			}					
 		}catch(ClassNotFoundException exc) {
 			System.out.println(exc.getMessage());
+			deportistas = null;
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Error de conexión").build();
-		}		
-		return Response.ok().build();
+		}			
 	}
 	
 }
