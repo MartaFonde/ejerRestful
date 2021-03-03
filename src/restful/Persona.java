@@ -6,10 +6,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Persona {
-	int id;
-	String nombre; // los atributos no pueden ser públicos
-	boolean casado;
-	String sexo;
+	private int id;
+	private String nombre; // los atributos no pueden ser públicos
+	private boolean casado;
+	private String sexo;
 	
 	public Persona() {
 		

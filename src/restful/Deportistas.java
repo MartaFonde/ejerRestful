@@ -34,77 +34,49 @@ public class Deportistas {
 	@Produces(MediaType.APPLICATION_JSON )
 	@Path("/")
 	public Response todos() {	
-		int res = getDeportistas("select * from deportistas", false);
-		if(res == -1) {
-			return Response.ok(deportistas).build();	
-		}			
-		return Response.status(Status.NO_CONTENT).build();
+		return getDeportistas("select * from deportistas", false);
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/{id}")
 	public Response jugadorId(@PathParam("id") int id) {
-		int res = getDeportistas("select * from deportistas where id="+id, false);		
-		if(res == -1) {
-			return Response.ok(deportistas).build();
-		}
-		return Response.status(Status.NOT_FOUND).build();
+		return getDeportistas("select * from deportistas where id="+id, false);		
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/deporte/{nombreDeporte}")
 	public Response porDeporte(@PathParam("nombreDeporte") String deporte) {
-		int res = getDeportistas("select * from deportistas where deporte like '"+deporte+"'", false);
-		if(res == -1) {
-			return Response.ok(deportistas).build();
-		}
-		return Response.status(Status.NO_CONTENT).build(); //204
+		return getDeportistas("select * from deportistas where deporte like '"+deporte+"'", false);	
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/activos")
 	public Response activos() {
-		int res = getDeportistas("select * from deportistas where activo=true", false);
-		if(res == -1) {
-			return Response.ok(deportistas).build();
-		}
-		return Response.status(Status.NO_CONTENT).build(); 
+		return getDeportistas("select * from deportistas where activo=true", false);
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/retirados")
 	public Response retirados() {
-		int res = getDeportistas("select * from deportistas where activo=false", false);
-		if(res == -1) {
-			return Response.ok(deportistas).build();
-		}
-		return Response.status(Status.NO_CONTENT).build(); 
+		return getDeportistas("select * from deportistas where activo=false", false);
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/masculinos")
 	public Response masculinos() {
-		int res = getDeportistas("select * from deportistas where genero='masculino'", false);
-		if(res == -1) {
-			return Response.ok(deportistas).build();
-		}
-		return Response.status(Status.NO_CONTENT).build(); 
+		return  getDeportistas("select * from deportistas where genero='masculino'", false); 
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/femeninos")
 	public Response femeninos() {
-		int res = getDeportistas("select * from deportistas where genero='femenino'", false);
-		if(res == -1) {
-			return Response.ok(deportistas).build();
-		}
-		return Response.status(Status.NO_CONTENT).build(); 
+		return getDeportistas("select * from deportistas where genero='femenino'", false);
 	}
 	
 
@@ -115,22 +87,14 @@ public class Deportistas {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/deporte/{nombreDeporte}/activos")
 	public Response porDepoteActivos(@PathParam("nombreDeporte") String nombreDeporte) {
-		int res = getDeportistas("select * from deportistas where deporte='"+nombreDeporte+"'"+"and activo=true", false);
-		if(res == -1) {
-			return Response.ok(deportistas).build();
-		}
-		return Response.status(Status.NO_CONTENT).build(); 
+		return getDeportistas("select * from deportistas where deporte='"+nombreDeporte+"'"+"and activo=true", false);
 	}
 		
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	@Path("/sdepor")
 	public Response numDeportistas() {
-		int res = getDeportistas("select * from deportistas group by nombre", false);
-		if(res == -1) {
-			return Response.status(Status.ACCEPTED).entity("Número de deportistas: "+deportistas.size()).build();
-		}
-		return Response.status(Status.NO_CONTENT).build(); 
+		return getDeportistas("select * from deportistas group by nombre", false);		
 	}
 	
 	@GET
@@ -163,12 +127,8 @@ public class Deportistas {
 	@Path("/")
 	public Response creaDeportista(Deportista depor) {
 		deportistas.add(depor);
-		int res = getDeportistas("insert into deportistas values ("+depor.getId()+",'"+
-				depor.getNombre()+"', "+depor.isActivo()+", '"+depor.getGenero()+"','"+depor.getDeporte()+"')", true);
-		if(res == 1) {
-			return Response.status(Status.ACCEPTED).entity("Filas afectadas: "+res).build();
-		}
-		return Response.status(Status.BAD_REQUEST).entity("Error al añadir deportista").build();
+		return getDeportistas("insert into deportistas values ("+depor.getId()+",'"+
+				depor.getNombre()+"', "+depor.isActivo()+", '"+depor.getGenero()+"','"+depor.getDeporte()+"')", true);		
 	}
 	
 	@POST
@@ -176,16 +136,16 @@ public class Deportistas {
 	@Produces(MediaType.TEXT_PLAIN)
 	@Path("/adds")
 	public Response creaDeportistas(Deportista[] depor) {
-		int f = 0;
+		Response res = Response.status(Status.BAD_REQUEST).build();
 		for(int i=0; i<depor.length; i++) {
-			int res = getDeportistas("insert into deportistas values ("+depor[i].getId()+",'"+
-					depor[i].getNombre()+"', "+depor[i].isActivo()+", '"+depor[i].getGenero()+"','"+depor[i].getDeporte()+"')", true);
-			f = res == 1? f+1 : f;			
-		}		
-		if(f  == depor.length) {
-			return Response.status(Status.ACCEPTED).entity("Filas afectadas: "+f).build();
-		}
-		return Response.status(Status.BAD_REQUEST).entity("Error al añadir deportistas").build();
+			res = getDeportistas("insert into deportistas values ("+depor[i].getId()+",'"+
+					depor[i].getNombre()+"', "+depor[i].isActivo()+", '"+depor[i].getGenero()+"','"+
+					depor[i].getDeporte()+"')", true);
+			if(res != Response.ok().build()) {
+				return res;
+			}		
+		}	
+		return res;
 	}
 	
 	@PUT
@@ -193,28 +153,20 @@ public class Deportistas {
 	@Produces(MediaType.TEXT_PLAIN)
 	@Path("/")
 	public Response actualizaDeportista(Deportista depor) {		
-		int res = getDeportistas("update deportistas set nombre='"+depor.getNombre()+
+		return getDeportistas("update deportistas set nombre='"+depor.getNombre()+
 				"', activo="+depor.isActivo()+", genero='"+depor.getGenero()+
-				"',deporte='"+depor.getDeporte()+"' where id="+depor.getId(), true);						
-		if(res >  0) {
-			return Response.status(Status.ACCEPTED).entity("Filas afectadas: "+res).build();
-		}
-		return Response.status(Status.BAD_REQUEST).entity("Error al añadir deportista").build();
+				"',deporte='"+depor.getDeporte()+"' where id="+depor.getId(), true);								
 	}
 	
 	@DELETE
 	@Produces(MediaType.TEXT_PLAIN)
 	@Path("/del/{id}")
 	public Response borraDeportista(@PathParam ("id") int id) {		
-		int res = getDeportistas("delete from deportistas where id="+id, true);						
-		if(res >  0) {
-			return Response.status(Status.ACCEPTED).entity("Filas afectadas: "+res).build();
-		}
-		return Response.status(Status.BAD_REQUEST).entity("Error al añadir deportista").build();
+		return getDeportistas("delete from deportistas where id="+id, true);							
 	}
 	
 	
-	public int getDeportistas(String query, boolean update){	
+	public Response getDeportistas(String query, boolean update){	
 		deportistas = new ArrayList<>();	
 		try {
 			Class.forName(driver);
@@ -227,18 +179,23 @@ public class Deportistas {
 						deportistas.add(new Deportista(rs.getInt(1), rs.getString(2), 
 								rs.getBoolean(3), rs.getString(4), rs.getString(5)));				
 					}	
+					Response.ok(deportistas).build();
 				}else {
-					return st.executeUpdate(query); //return cant filas afectadas -- 0 se ningunha é afectada
+					int filasAfectadas = st.executeUpdate(query); 
+					if(filasAfectadas== 0) 
+						return Response.status(Status.OK).entity("Filas afectadas: "+filasAfectadas).build();
+					else 
+						return Response.status(Status.BAD_REQUEST).entity("Error al añadir deportista").build();
 				}												
 			}catch(SQLException ex) {
 				System.out.println(ex.getMessage());
-				return -2; //fallo
+				return Response.status(Status.BAD_REQUEST).entity("Error al realizar la consulta").build();
 			}					
 		}catch(ClassNotFoundException exc) {
 			System.out.println(exc.getMessage());
-			return -2; //fallo
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Error de conexión").build();
 		}		
-		return -1; //todo ok
+		return Response.ok().build();
 	}
 	
 }

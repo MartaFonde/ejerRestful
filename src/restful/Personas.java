@@ -60,7 +60,7 @@ public class Personas {
 	public Response ver(@PathParam("nombre") String nombre) {
 		ArrayList<Persona> personasPatron = new ArrayList<Persona>();
 		for(int i = 0; i < personas.size(); i++) {
-			if(personas.get(i).nombre.equals(nombre)) {
+			if(personas.get(i).getNombre().equals(nombre)) {
 				personasPatron.add(personas.get(i));
 			}
 		}		
@@ -92,7 +92,7 @@ public class Personas {
 	public Response ver2(@DefaultValue("aa") @QueryParam("nombre") String nombre){	//= método (GET) conflicto de nomes de funct
 		ArrayList<Persona> personasPatron = new ArrayList<Persona>();
 		for(int i = 0; i < personas.size(); i++) {
-			if(personas.get(i).nombre.toLowerCase().contains(nombre.toLowerCase())) {
+			if(personas.get(i).getNombre().toLowerCase().contains(nombre.toLowerCase())) {
 				personasPatron.add(personas.get(i));
 			}
 		}		
@@ -135,7 +135,7 @@ public class Personas {
 	@Path("/{id}")	
 	public Response borrar(@PathParam("id") int id) {		
 		for(int i = 0; i < personas.size(); i++) {
-			if(personas.get(i).id == id) {
+			if(personas.get(i).getId() == id) {
 				return Response.ok(personas.remove(i)).build(); //mostra que persona elimina
 			}
 		}
@@ -147,7 +147,7 @@ public class Personas {
 	@Path("/XML/{id}")
 	public Response mostrarPersona(@PathParam("id") int id) {
 		for(int i = 0; i<personas.size(); i++) {
-			if(personas.get(i).id == id) {
+			if(personas.get(i).getId() == id) {
 				return Response.ok(personas.get(i)).build();
 			}
 		}
@@ -159,7 +159,7 @@ public class Personas {
 	@GET	
 	@Path("/galego")	
 	public ArrayList<Persona> atributosGalego() {	 
-		//@XmlElement(name="nome") en clase Persona
+		//@XmlElement(name="nome") en getNombre() clase Persona
 		return personas;
 	}			
 	//https://howtodoinjava.com/jaxb/jaxb-annotations/		
